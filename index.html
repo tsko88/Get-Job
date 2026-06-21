@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Help Tom Find His Next Gig!</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+    <style>
+        :root {
+            --primary: #4A8FA3;
+            --primary-hover: #3D7A8C;
+            --success: #5A8F7B;
+            --warning: #B8956A;
+            --danger: #A85D5D;
+            --muted: #7A8B94;
+            --border: #D4DEE5;
+            --bg: #F5F2EC;
+            --card: #FDFCFA;
+            --text: #2C3E46;
+            --radius: 14px;
+            --shadow: 0 4px 16px rgba(0,0,0,0.08);
+            --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        }
+        *, *::before, *::after { box-sizing: border-box; }
+        html { font-size: 16px; }
+        body {
+            margin: 0; font-family: var(--font); background: var(--bg); color: var(--text);
+            line-height: 1.6; min-height: 100vh;
+        }
+        /* Hero */
+        .hero {
+            background: linear-gradient(135deg, #3D7A8C 0%, #4A8FA3 40%, #5A8F7B 100%);
+            color: #fff; padding: 60px 20px 50px; text-align: center; position: relative; overflow: hidden;
+        }
+        .hero::before {
+            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+            background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.08) 0%, transparent 50%);
+            pointer-events: none;
+        }
+        .hero h1 { margin: 0 0 12px; font-size: 2.6rem; letter-spacing: -1px; font-weight: 800; position: relative; }
+        .hero p { margin: 0; opacity: 0.92; font-size: 1.15rem; max-width: 540px; margin-left: auto; margin-right: auto; position: relative; }
+        .emoji-row { font-size: 2.2rem; margin-top: 18px; letter-spacing: 8px; position: relative; }
+        /* Layout */
+        .container { max-width: 960px; margin: 0 auto; padding: 32px 20px; }
+        /* Card */
+        .card {
+            background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
+            padding: 32px; margin-bottom: 24px; box-shadow: var(--shadow);
+        }
+        .card-title { margin: 0 0 8px; font-size: 1.3rem; font-weight: 700; color: var(--text); }
+        .card-subtitle { margin: 0 0 24px; color: var(--muted); font-size: 0.95rem; }
+        /* Form */
+        .form-group { margin-bottom: 20px; }
+        label { display: block; font-weight: 600; margin-bottom: 6px; font-size: 0.9rem; color: #4A5A62; }
+        label .opt { font-weight: 400; color: var(--muted); font-size: 0.82rem; }
+        input, textarea {
+            width: 100%; padding: 12px 14px; border: 1.5px solid var(--border); border-radius: 10px;
+            font-family: inherit; font-size: 1rem; background: #fff; color: var(--text);
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        input:focus, textarea:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 4px rgba(74,143,163,0.1); }
+        textarea { resize: vertical; min-height: 80px; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        /* Button */
+        .btn-submit {
+            width: 100%; padding: 14px; border: none; border-radius: 10px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--success) 100%);
+            color: #fff; font-size: 1.1rem; font-weight: 700; cursor: pointer;
+            transition: transform 0.15s, box-shadow 0.15s; position: relative; overflow: hidden;
+        }
+        .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(74,143,163,0.3); }
+        .btn-submit:active { transform: translateY(0); }
+        .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+        /* Resume embed */
+        .embed-section { text-align: center; }
+        .embed-section h2 { margin: 0 0 8px; font-size: 1.2rem; }
+        .embed-section p { margin: 0 0 20px; color: var(--muted); font-size: 0.9rem; }
+        .resume-frame {
+            width: 100%; height: 1400px; border: 1.5px solid var(--border); border-radius: var(--radius);
+            box-shadow: var(--shadow); background: #fff;
+        }
+        /* Success state */
+        .success-state { text-align: center; padding: 40px 20px; display: none; }
+        .success-state .icon { font-size: 4rem; margin-bottom: 16px; }
+        .success-state h2 { margin: 0 0 8px; font-size: 1.6rem; }
+        .success-state p { margin: 0; color: var(--muted); }
+        .success-state .btn-again {
+            margin-top: 24px; padding: 10px 24px; border: 1.5px solid var(--primary); border-radius: 8px;
+            background: transparent; color: var(--primary); font-size: 0.95rem; font-weight: 600; cursor: pointer;
+        }
+        .success-state .btn-again:hover { background: var(--primary); color: #fff; }
+        /* Error */
+        .error-msg { color: var(--danger); font-size: 0.88rem; margin-top: 6px; display: none; }
+        /* Spinner */
+        .spinner {
+            display: inline-block; width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.4);
+            border-top-color: #fff; border-radius: 50%; animation: spin 0.6s linear infinite;
+            vertical-align: middle; margin-right: 8px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        /* Footer */
+        footer { text-align: center; padding: 24px; color: var(--muted); font-size: 0.85rem; }
+        /* Responsive */
+        @media (max-width: 560px) {
+            .hero h1 { font-size: 1.9rem; }
+            .form-row { grid-template-columns: 1fr; }
+            .card { padding: 22px; }
+            .resume-frame { height: 650px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="hero">
+        <h1>Help Tom Land His Next Gig! </h1>
+        <p>Know of a great role? Drop the link below and I'll check it out. Thanks for having my back!</p>
+        <div class="emoji-row"></div>
+    </div>
+
+    <div class="container">
+        <!-- Form Card -->
+        <div class="card" id="form-card">
+            <div class="card-title"><i class="fas fa-paper-plane" style="color:var(--primary);margin-right:8px;"></i>Share a Job Lead</div>
+            <div class="card-subtitle">Just the company and role is all I need. Anything extra is a bonus!</div>
+            <form id="referral-form" novalidate>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="company">Company Name *</label>
+                        <input type="text" id="company" placeholder="e.g. Spotify" required>
+                        <div class="error-msg" id="err-company">Please enter a company name.</div>
+                    </div>
+                    <div class="form-group">
+                        <label for="title">Job Title *</label>
+                        <input type="text" id="title" placeholder="e.g. Operations Manager" required>
+                        <div class="error-msg" id="err-title">Please enter a job title.</div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="url">Job Posting Link *</label>
+                    <input type="text" id="url" placeholder="careers.company.com/jobs/..." required>
+                    <div class="error-msg" id="err-url">Please enter a valid URL.</div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="friend-name">Your Name <span class="opt">(optional)</span></label>
+                        <input type="text" id="friend-name" placeholder="So I can thank you!">
+                    </div>
+                    <div class="form-group">
+                        <label for="friend-note">Note <span class="opt">(optional)</span></label>
+                        <input type="text" id="friend-note" placeholder="Why you think it's a fit">
+                    </div>
+                </div>
+                <button type="submit" class="btn-submit" id="submit-btn">
+                    <i class="fas fa-rocket" style="margin-right:8px;"></i>Send It My Way!
+                </button>
+            </form>
+        </div>
+
+        <!-- Success State -->
+        <div class="card success-state" id="success-card">
+            <div class="icon">🙌</div>
+            <h2>You're the Best!</h2>
+            <p>I've got the link and I'll dive into it soon. Seriously, thank you!</p>
+            <button class="btn-again" onclick="resetForm()">Submit Another</button>
+        </div>
+
+        <!-- Resume Embed -->
+        <div class="card embed-section">
+            <h2><i class="fas fa-user" style="color:var(--primary);margin-right:8px;"></i>What I'm About</h2>
+            <p>Here's my resume website if you want to see what I'm looking for.</p>
+            <iframe class="resume-frame" src="https://www.tomskovran.com" title="Tom Skovran Resume" loading="lazy"></iframe>
+        </div>
+    </div>
+
+    <footer>
+        Made with 💙 by friends like you · <a href="https://www.tomskovran.com" target="_blank" style="color:var(--primary);">tomskovran.com</a>
+    </footer>
+
+    <script>
+        // Supabase config
+        const SUPABASE_URL = 'https://oaxlpxalczryxqtvmpbs.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable_Mnh6E9amYqC0HT4qphof1w_1_YgHwJ9';
+
+        const form = document.getElementById('referral-form');
+        const submitBtn = document.getElementById('submit-btn');
+        const formCard = document.getElementById('form-card');
+        const successCard = document.getElementById('success-card');
+
+        function showError(id, show) {
+            document.getElementById(id).style.display = show ? 'block' : 'none';
+        }
+
+        function validate() {
+            let ok = true;
+            const company = document.getElementById('company').value.trim();
+            const title = document.getElementById('title').value.trim();
+            const url = document.getElementById('url').value.trim();
+            const isValidUrl = url.length > 0 && url.includes('.') && !url.includes(' ');
+            showError('err-company', !company);
+            showError('err-title', !title);
+            showError('err-url', !isValidUrl);
+            if (!company || !title || !isValidUrl) ok = false;
+            return ok;
+        }
+
+        async function submitToSupabase(data) {
+            const res = await fetch(`${SUPABASE_URL}/rest/v1/referrals`, {
+                method: 'POST',
+                headers: {
+                    'apikey': SUPABASE_KEY,
+                    'Authorization': `Bearer ${SUPABASE_KEY}`,
+                    'Content-Type': 'application/json',
+                    'Prefer': 'return=minimal'
+                },
+                body: JSON.stringify(data)
+            });
+            if (!res.ok) {
+                const err = await res.text();
+                throw new Error(err);
+            }
+        }
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!validate()) return;
+
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="spinner"></span>Sending...';
+
+            let url = document.getElementById('url').value.trim();
+            if (url && !/^https?:\/\//i.test(url)) {
+                url = 'https://' + url;
+            }
+
+            const payload = {
+                company: document.getElementById('company').value.trim(),
+                title: document.getElementById('title').value.trim(),
+                url: url,
+                friend_name: document.getElementById('friend-name').value.trim() || null,
+                friend_note: document.getElementById('friend-note').value.trim() || null,
+                status: 'pending'
+            };
+
+            try {
+                await submitToSupabase(payload);
+                formCard.style.display = 'none';
+                successCard.style.display = 'block';
+                confetti({
+                    particleCount: 120,
+                    spread: 70,
+                    origin: { y: 0.6 },
+                    colors: ['#4A8FA3', '#5A8F7B', '#B8956A', '#3D7A8C', '#A85D5D']
+                });
+            } catch (err) {
+                console.error(err);
+                alert('Oops, something went wrong. Mind trying again?');
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-rocket" style="margin-right:8px;"></i>Send It My Way!';
+            }
+        });
+
+        function resetForm() {
+            form.reset();
+            successCard.style.display = 'none';
+            formCard.style.display = 'block';
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="fas fa-rocket" style="margin-right:8px;"></i>Send It My Way!';
+            document.getElementById('company').focus();
+        }
+    </script>
+</body>
+</html>
