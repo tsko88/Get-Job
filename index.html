@@ -121,23 +121,23 @@
         <!-- Form Card -->
         <div class="card" id="form-card">
             <div class="card-title"><i class="fas fa-paper-plane" style="color:var(--primary);margin-right:8px;"></i>Share a Job Lead</div>
-            <div class="card-subtitle">Just the company and role is all I need. Anything extra is a bonus!</div>
+            <div class="card-subtitle">All fields are optional — share what you can, even just a link helps!</div>
             <form id="referral-form" novalidate>
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="company">Company Name *</label>
-                        <input type="text" id="company" placeholder="e.g. Spotify" required>
+                        <label for="company">Company Name <span class="opt">(optional)</span></label>
+                        <input type="text" id="company" placeholder="e.g. Spotify">
                         <div class="error-msg" id="err-company">Please enter a company name.</div>
                     </div>
                     <div class="form-group">
-                        <label for="title">Job Title *</label>
-                        <input type="text" id="title" placeholder="e.g. Operations Manager" required>
+                        <label for="title">Job Title <span class="opt">(optional)</span></label>
+                        <input type="text" id="title" placeholder="e.g. Operations Manager">
                         <div class="error-msg" id="err-title">Please enter a job title.</div>
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="url">Job Posting Link *</label>
-                    <input type="text" id="url" placeholder="careers.company.com/jobs/..." required>
+                    <label for="url">Job Posting Link <span class="opt">(optional)</span></label>
+                    <input type="text" id="url" placeholder="careers.company.com/jobs/...">
                     <div class="error-msg" id="err-url">Please enter a valid URL.</div>
                 </div>
                 <div class="form-row">
@@ -191,16 +191,7 @@
         }
 
         function validate() {
-            let ok = true;
-            const company = document.getElementById('company').value.trim();
-            const title = document.getElementById('title').value.trim();
-            const url = document.getElementById('url').value.trim();
-            const isValidUrl = url.length > 0 && url.includes('.') && !url.includes(' ');
-            showError('err-company', !company);
-            showError('err-title', !title);
-            showError('err-url', !isValidUrl);
-            if (!company || !title || !isValidUrl) ok = false;
-            return ok;
+            return true;
         }
 
         async function submitToSupabase(data) {
